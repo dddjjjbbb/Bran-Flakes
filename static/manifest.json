@@ -1,0 +1,23 @@
+{
+  "name": "bran-flakes",
+  "manifest_version": 2,
+  "version": "0.0",
+
+  "browser_action": {
+    "default_icon": {                
+      "128": "images/icon128.png"      
+    },
+    "default_title": "Create Branch Name",  
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": ["contentscript.js"]
+    }
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}
