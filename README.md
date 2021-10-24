@@ -1,13 +1,9 @@
-![Logo of the project](https://raw.githubusercontent.com/jehna/readme-best-practices/master/sample-logo.png)
-
 # Bran Flakes
 
 > Create git branches from Jira tickets
 
 Sick of creating git branches manually? Use bran-flakes to generate them for you.
 Simply copy the generated git branch name to your command line.
-
-Please note the default branch name follows
 
 ## Installing / Getting started
 
