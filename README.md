@@ -3,7 +3,7 @@
 > Create git branches from Jira tickets
 
 Sick of creating git branches manually? Use bran-flakes to generate them for you.
-Simply copy the generated git branch name to your command line.
+Simply click the icon and copy the generated git branch name to your command line.
 
 ## Installing / Getting started
 
@@ -14,7 +14,7 @@ npm build # generates dist dir
 open chrome > extensions > "load unpacked" > point at the dist dir
 ```
 
-## Developing
+## Development
 
 ```shell
 git clone https://github.com/dddjjjbbb/bran-flakes.git
@@ -33,7 +33,7 @@ This uses [parcel](https://www.npmjs.com/package/parcel) to compile ts files to 
 
 ## Features
 
-- Tap icon on JIRA issue, generate branch name.
+- Tap icon on JIRA issue url, generate branch name.
 
 ## Configuration
 
