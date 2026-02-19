@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { main } from './contentscript'
-
-const DOMAIN_NAME = 'jira.sharethemeal.org'
+import { loadDomain } from './config'
 
 function App() {
   const [gitBranchName, setGitBranchName] = useState('')
@@ -9,7 +8,7 @@ function App() {
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
-    main(DOMAIN_NAME).then(setGitBranchName)
+    loadDomain().then((domain) => main(domain)).then(setGitBranchName)
   }, [])
 
   const copyToClipboard = () => {

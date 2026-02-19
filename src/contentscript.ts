@@ -1,4 +1,5 @@
 import { parse } from 'node-html-parser'
+import { loadDomain } from './config'
 
 export class Parser {
   public window: Window
@@ -92,6 +93,5 @@ export async function main(domainName: string) {
 }
 
 if (typeof window !== 'undefined') {
-  const DOMAIN_NAME = 'jira.sharethemeal.org'
-  main(DOMAIN_NAME).then((result) => alert(result))
+  loadDomain().then((domain) => main(domain)).then((result) => alert(result))
 }
