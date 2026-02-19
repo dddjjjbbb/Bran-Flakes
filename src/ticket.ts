@@ -1,3 +1,5 @@
+import { default as HTMLElement } from 'node-html-parser/dist/nodes/html'
+
 export const TICKET_TYPE_ABBREVIATIONS: Record<string, string> = {
   'Tech Ticket': 'Tech',
   'Bug': 'Bug',
@@ -8,50 +10,56 @@ export const TICKET_TYPE_ABBREVIATIONS: Record<string, string> = {
 }
 
 export class Ticket {
-  public html: any
+  private html: HTMLElement
 
-  constructor(html: any) {
+  constructor(html: HTMLElement) {
     this.html = html
   }
 
-  public async buildBranchName(): Promise<string> {
-    const ticketType = await this._getTicketType()
-    const ticketNumber = await this._getTicketNumber()
-    const ticketName = await this._getTicketName()
+  public buildBranchName(): string {
+    const ticketType = this.getTicketType()
+    const ticketNumber = this.getTicketNumber()
+    const ticketName = this.getTicketName()
 
     const branchName = `${ticketType}/${ticketNumber}_${ticketName}`
-    return this._cleanBranchName(branchName)
+    return this.cleanBranchName(branchName)
   }
 
-  public async _getabbreviated_ticket_name(
-    ticketType: string,
-  ): Promise<string> {
+  private abbreviateTicketType(ticketType: string): string {
     return TICKET_TYPE_ABBREVIATIONS[ticketType] || ticketType
   }
 
-  public async _getTicketType(): Promise<string | undefined> {
-    const ticketTypeFromHtml = this.html
-      .querySelector(`#type-val`)
-      .innerText.trim()
-    const result = await this._getabbreviated_ticket_name(ticketTypeFromHtml)
-    if (!result) {
-      return undefined
+  private getTicketType(): string {
+    const element = this.html.querySelector('#type-val')
+    if (!element) {
+      throw new Error('Could not find ticket type element (#type-val)')
     }
-    return result.toLowerCase()
+    const ticketTypeFromHtml = element.innerText.trim()
+    return this.abbreviateTicketType(ticketTypeFromHtml).toLowerCase()
   }
 
-  public async _getTicketNumber(): Promise<string> {
-    return this.html.querySelector(`#key-val`).innerText.toLowerCase()
+  private getTicketNumber(): string {
+    const element = this.html.querySelector('#key-val')
+    if (!element) {
+      throw new Error('Could not find ticket number element (#key-val)')
+    }
+    return element.innerText.toLowerCase()
   }
 
-  public async _getTicketName(): Promise<string> {
-    return this.html
-      .querySelector(`#summary-val`)
-      .innerText.toLowerCase()
-      .replace(/\s/g, '-')
+  private getTicketName(): string {
+    const element = this.html.querySelector('#summary-val')
+    if (!element) {
+      throw new Error('Could not find ticket name element (#summary-val)')
+    }
+    return element.innerText.toLowerCase().replace(/\s/g, '-')
   }
 
-  public async _cleanBranchName(branchName: string): Promise<string> {
-    return branchName.replace(/[():]/g, '')
+  private cleanBranchName(branchName: string): string {
+    return branchName
+      .replace(/[():~^*?\[\]{}@#\\!'"`,;|<>&$%+= ]/g, '')
+      .replace(/\.{2,}/g, '.')
+      .replace(/\.lock($|\/)/g, '$1')
+      .replace(/-{2,}/g, '-')
+      .replace(/[-_]+$/, '')
   }
 }

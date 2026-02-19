@@ -49,95 +49,107 @@ describe('TICKET_TYPE_ABBREVIATIONS', () => {
   })
 })
 
-describe('Ticket._cleanBranchName', () => {
-  const ticket = makeTicket('Bug', 'PROJ-1', 'placeholder')
-
-  it('removes parentheses from branch name', async () => {
-    expect(await ticket._cleanBranchName('bug/proj-1_fix-(urgent)')).toBe('bug/proj-1_fix-urgent')
-  })
-
-  it('removes colons from branch name', async () => {
-    expect(await ticket._cleanBranchName('bug/proj-1_fix:-thing')).toBe('bug/proj-1_fix-thing')
-  })
-
-  it('removes multiple special characters', async () => {
-    expect(await ticket._cleanBranchName('bug/proj-1_fix:(a):(b)')).toBe('bug/proj-1_fixab')
-  })
-
-  it('leaves clean names unchanged', async () => {
-    expect(await ticket._cleanBranchName('bug/proj-1_fix-thing')).toBe('bug/proj-1_fix-thing')
-  })
-})
-
-describe('Ticket._getTicketNumber', () => {
-  it('returns the ticket number in lowercase', async () => {
-    const ticket = makeTicket('Bug', 'PROJ-123', 'Some Summary')
-    expect(await ticket._getTicketNumber()).toBe('proj-123')
-  })
-})
-
-describe('Ticket._getTicketName', () => {
-  it('converts summary to lowercase with hyphens', async () => {
-    const ticket = makeTicket('Bug', 'PROJ-1', 'Fix Login Page')
-    expect(await ticket._getTicketName()).toBe('fix-login-page')
-  })
-
-  it('replaces all whitespace with hyphens', async () => {
-    const ticket = makeTicket('Bug', 'PROJ-1', 'Fix  Multiple   Spaces')
-    expect(await ticket._getTicketName()).toBe('fix--multiple---spaces')
-  })
-})
-
-describe('Ticket._getTicketType', () => {
-  it('returns abbreviated type for Tech Ticket', async () => {
-    const ticket = makeTicket('Tech Ticket', 'PROJ-1', 'summary')
-    expect(await ticket._getTicketType()).toBe('tech')
-  })
-
-  it('returns bug for Bug', async () => {
-    const ticket = makeTicket('Bug', 'PROJ-1', 'summary')
-    expect(await ticket._getTicketType()).toBe('bug')
-  })
-
-  it('returns task for Task', async () => {
-    const ticket = makeTicket('Task', 'PROJ-1', 'summary')
-    expect(await ticket._getTicketType()).toBe('task')
-  })
-
-  it('returns epic for Epic', async () => {
-    const ticket = makeTicket('Epic', 'PROJ-1', 'summary')
-    expect(await ticket._getTicketType()).toBe('epic')
-  })
-
-  it('returns feature for Feature Story', async () => {
-    const ticket = makeTicket('Feature Story', 'PROJ-1', 'summary')
-    expect(await ticket._getTicketType()).toBe('feature')
-  })
-
-  it('returns release for Release Ticket', async () => {
-    const ticket = makeTicket('Release Ticket', 'PROJ-1', 'summary')
-    expect(await ticket._getTicketType()).toBe('release')
-  })
-})
-
 describe('Ticket.buildBranchName', () => {
-  it('builds a complete branch name from a Bug ticket', async () => {
+  it('builds a branch name from a Bug ticket', () => {
     const ticket = makeTicket('Bug', 'PROJ-123', 'Fix Login Page')
-    expect(await ticket.buildBranchName()).toBe('bug/proj-123_fix-login-page')
+    expect(ticket.buildBranchName()).toBe('bug/proj-123_fix-login-page')
   })
 
-  it('builds a branch name for a Tech Ticket', async () => {
+  it('builds a branch name for a Tech Ticket', () => {
     const ticket = makeTicket('Tech Ticket', 'PROJ-456', 'Upgrade Dependencies')
-    expect(await ticket.buildBranchName()).toBe('tech/proj-456_upgrade-dependencies')
+    expect(ticket.buildBranchName()).toBe('tech/proj-456_upgrade-dependencies')
   })
 
-  it('builds a branch name for a Feature Story', async () => {
+  it('builds a branch name for a Feature Story', () => {
     const ticket = makeTicket('Feature Story', 'PROJ-789', 'Add User Dashboard')
-    expect(await ticket.buildBranchName()).toBe('feature/proj-789_add-user-dashboard')
+    expect(ticket.buildBranchName()).toBe('feature/proj-789_add-user-dashboard')
   })
 
-  it('strips parentheses and colons from the final name', async () => {
+  it('builds a branch name for a Task', () => {
+    const ticket = makeTicket('Task', 'PROJ-1', 'Update Config')
+    expect(ticket.buildBranchName()).toBe('task/proj-1_update-config')
+  })
+
+  it('builds a branch name for an Epic', () => {
+    const ticket = makeTicket('Epic', 'PROJ-1', 'Redesign')
+    expect(ticket.buildBranchName()).toBe('epic/proj-1_redesign')
+  })
+
+  it('builds a branch name for a Release Ticket', () => {
+    const ticket = makeTicket('Release Ticket', 'PROJ-1', 'Version Two')
+    expect(ticket.buildBranchName()).toBe('release/proj-1_version-two')
+  })
+
+  it('lowercases the ticket number', () => {
+    const ticket = makeTicket('Bug', 'PROJ-123', 'Summary')
+    expect(ticket.buildBranchName()).toBe('bug/proj-123_summary')
+  })
+
+  it('replaces whitespace with hyphens in the summary', () => {
+    const ticket = makeTicket('Bug', 'PROJ-1', 'Fix Multiple Spaces')
+    expect(ticket.buildBranchName()).toBe('bug/proj-1_fix-multiple-spaces')
+  })
+
+  it('strips parentheses from the branch name', () => {
+    const ticket = makeTicket('Bug', 'PROJ-1', 'Fix (urgent) bug')
+    expect(ticket.buildBranchName()).toBe('bug/proj-1_fix-urgent-bug')
+  })
+
+  it('strips colons from the branch name', () => {
+    const ticket = makeTicket('Bug', 'PROJ-1', 'Fix: thing')
+    expect(ticket.buildBranchName()).toBe('bug/proj-1_fix-thing')
+  })
+
+  it('strips multiple special characters from the branch name', () => {
     const ticket = makeTicket('Bug', 'PROJ-1', 'Fix (critical): login issue')
-    expect(await ticket.buildBranchName()).toBe('bug/proj-1_fix-critical-login-issue')
+    expect(ticket.buildBranchName()).toBe('bug/proj-1_fix-critical-login-issue')
+  })
+
+  it('strips trailing hyphens from the branch name', () => {
+    const ticket = makeTicket('Bug', 'BE-4378', 'Observability fix routes without targets ')
+    expect(ticket.buildBranchName()).toBe('bug/be-4378_observability-fix-routes-without-targets')
+  })
+
+  it('strips trailing underscores from the branch name', () => {
+    const ticket = makeTicket('Bug', 'PROJ-1', 'Trailing underscore_ ')
+    expect(ticket.buildBranchName()).toBe('bug/proj-1_trailing-underscore')
+  })
+
+  it('strips square brackets from the branch name', () => {
+    const ticket = makeTicket('Bug', 'PROJ-1', 'Fix [WIP] thing')
+    expect(ticket.buildBranchName()).toBe('bug/proj-1_fix-wip-thing')
+  })
+
+  it('strips curly braces and other git-invalid characters', () => {
+    const ticket = makeTicket('Bug', 'PROJ-1', 'Fix ~thing^ with *special? chars')
+    expect(ticket.buildBranchName()).toBe('bug/proj-1_fix-thing-with-special-chars')
+  })
+
+  it('collapses consecutive hyphens into one', () => {
+    const ticket = makeTicket('Bug', 'PROJ-1', 'Fix: : thing')
+    expect(ticket.buildBranchName()).toBe('bug/proj-1_fix-thing')
+  })
+
+  it('uses the raw type name when no abbreviation exists', () => {
+    const ticket = makeTicket('Spike', 'PROJ-1', 'Research')
+    expect(ticket.buildBranchName()).toBe('spike/proj-1_research')
+  })
+
+  it('throws when ticket type element is missing', () => {
+    const html = parse('<html><body><a id="key-val">PROJ-1</a><h1 id="summary-val">S</h1></body></html>')
+    const ticket = new Ticket(html)
+    expect(() => ticket.buildBranchName()).toThrow('Could not find ticket type element')
+  })
+
+  it('throws when ticket number element is missing', () => {
+    const html = parse('<html><body><span id="type-val">Bug</span><h1 id="summary-val">S</h1></body></html>')
+    const ticket = new Ticket(html)
+    expect(() => ticket.buildBranchName()).toThrow('Could not find ticket number element')
+  })
+
+  it('throws when summary element is missing', () => {
+    const html = parse('<html><body><span id="type-val">Bug</span><a id="key-val">PROJ-1</a></body></html>')
+    const ticket = new Ticket(html)
+    expect(() => ticket.buildBranchName()).toThrow('Could not find ticket name element')
   })
 })
