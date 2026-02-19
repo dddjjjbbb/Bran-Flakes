@@ -3,12 +3,10 @@
   "scripts": {
     "start": "yarn clean && yarn copy-static && yarn watch:all",
     "build": "yarn clean && yarn build:all && yarn copy-static",
-    "build:all": "yarn build:contentscript & yarn build:popup & yarn build:options",
-    "build:contentscript": "parcel build src/contentscript.ts -o contentscript.js",
+    "build:all": "yarn build:popup & yarn build:options",
     "build:popup": "parcel build src/popup.tsx -o popup.js --public-url='/'",
     "build:options": "parcel build src/options.ts -o options.js",
-    "watch:all": "yarn watch:contentscript & yarn watch:popup & yarn watch:options & npm-watch & yarn css-types -w",
-    "watch:contentscript": "parcel watch src/contentscript.ts -o contentscript.js",
+    "watch:all": "yarn watch:popup & yarn watch:options & npm-watch & yarn css-types -w",
     "watch:popup": "parcel watch src/popup.tsx -o popup.js --public-url='/'",
     "watch:options": "parcel watch src/options.ts -o options.js",
     "copy-static": "cp -r static/ dist/",
@@ -50,8 +48,11 @@
     "react-dom": "^16.14.0"
   },
   "lint-staged": {
-    "*.{ts,tsx}": "tslint"
+    "*.{ts,tsx}": [
+      "tslint",
+      "vitest run --reporter=verbose"
+    ]
   },
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true
 }

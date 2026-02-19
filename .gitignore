@@ -1,8 +1,34 @@
-.cache
-dist
-node_modules
-.vscode
-yarn-error.log
+# Build output
+dist/
+.cache/
+
+# Dependencies
+node_modules/
+
+# Generated files
 *.css.d.ts
-/.envrc
+
+# Logs
+yarn-error.log
+npm-debug.log*
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.envrc
+.env
+.env.*
+
+# Extension packaging
+*.xpi
+*.crx
+*.pem
+web-ext-artifacts/
