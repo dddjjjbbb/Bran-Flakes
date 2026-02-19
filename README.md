@@ -1,49 +1,38 @@
 # Bran Flakes
 
-> Create git branches from Jira tickets
+> Generate git branch names from Jira tickets.
 
-Sick of creating git branches manually? Use bran-flakes to generate them for you.
-Simply click the icon and copy the generated git branch name to your command line.
+Click the extension icon on any Jira issue page to get a formatted branch name like `bug/proj-123_fix-login-page`, then copy it to your clipboard.
 
-## Installing / Getting started
+## Install
 
 ```shell
-nvm use 14.17.6
-npm i
-npm build # generates dist dir
-open chrome > extensions > "load unpacked" > point at the dist dir
+npm install
+npm run build
 ```
+
+Then load the `dist/` directory as an unpacked extension in Chrome (`chrome://extensions` > "Load unpacked").
+
+## Configuration
+
+Open the extension's options page (right-click the icon > Options) and enter your Jira domain (e.g. `jira.mycompany.com`). The extension only activates on pages matching this domain.
 
 ## Development
 
 ```shell
-git clone https://github.com/dddjjjbbb/bran-flakes.git
-cd bran-flakes/
-npm install yarn
-npm install
+npm start        # watch mode with hot reload
+npm test         # run tests
+npm run test:watch  # run tests in watch mode
 ```
 
-### Building
+## Branch name format
 
-```shell
-npm build # generates dist directory
+```
+{ticketType}/{ticketNumber}_{ticketName}
 ```
 
-This uses [parcel](https://www.npmjs.com/package/parcel) to compile ts files to js and prepare resulting dist dir for import in your browser.
+Ticket types are abbreviated: `Tech Ticket` becomes `tech`, `Feature Story` becomes `feature`, `Release Ticket` becomes `release`. Others (`Bug`, `Task`, `Epic`) stay as-is. Parentheses and colons are stripped from the name.
 
-## Features
+## Licence
 
-- Tap icon on JIRA issue url, generate branch name.
-
-## Configuration
-
-- Configuration rules will be offered in the future.
-
-## Contributing
-
-If you'd like to contribute, please fork the repository and use a feature
-branch. Pull requests are warmly welcome.
-
-## Licensing
-
-The code in this project is licensed under GPLv3
+GPLv3
