@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
+import { afterEach, describe, it, expect, vi } from 'vitest'
 import { parse } from 'node-html-parser'
-import { TICKET_TYPE_ABBREVIATIONS, Ticket } from './contentscript'
+import { TICKET_TYPE_ABBREVIATIONS, Ticket, main } from './contentscript'
 
 function buildJiraHtml(ticketType: string, ticketNumber: string, summary: string): string {
   return `
@@ -140,5 +140,39 @@ describe('Ticket.buildBranchName', () => {
   it('strips parentheses and colons from the final name', async () => {
     const ticket = makeTicket('Bug', 'PROJ-1', 'Fix (critical): login issue')
     expect(await ticket.buildBranchName()).toBe('bug/proj-1_fix-critical-login-issue')
+  })
+})
+
+describe('main', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  function stubWindow(url: string, bodyHtml: string) {
+    vi.stubGlobal('window', {
+      location: { href: url },
+      document: {
+        documentElement: {
+          outerHTML: `<html><body>${bodyHtml}</body></html>`,
+        },
+      },
+    })
+  }
+
+  it('returns a branch name when the domain matches', async () => {
+    stubWindow(
+      'https://jira.sharethemeal.org/browse/PROJ-42',
+      `<span id="type-val">Bug</span>
+       <a id="key-val">PROJ-42</a>
+       <h1 id="summary-val">Fix Login</h1>`,
+    )
+    const result = await main('jira.sharethemeal.org')
+    expect(result).toBe('bug/proj-42_fix-login')
+  })
+
+  it('returns error message when domain does not match', async () => {
+    stubWindow('https://other-site.com/page', '')
+    const result = await main('jira.sharethemeal.org')
+    expect(result).toBe('Could not generate branch name')
   })
 })
