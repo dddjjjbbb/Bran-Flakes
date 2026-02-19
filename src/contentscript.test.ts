@@ -1,42 +1,35 @@
-import { afterEach, describe, it, expect, vi } from 'vitest'
-import { main } from './contentscript'
+import { describe, it, expect } from 'vitest'
+import { buildBranchNameFromHtml, isJiraDomain } from './contentscript'
 
-describe('main', () => {
-  afterEach(() => {
-    vi.unstubAllGlobals()
+function jiraHtml(type: string, key: string, summary: string): string {
+  return `<html><body>
+    <span id="type-val">${type}</span>
+    <a id="key-val">${key}</a>
+    <h1 id="summary-val">${summary}</h1>
+  </body></html>`
+}
+
+describe('buildBranchNameFromHtml', () => {
+  it('returns a branch name from valid Jira HTML', () => {
+    const html = jiraHtml('Bug', 'PROJ-42', 'Fix Login')
+    expect(buildBranchNameFromHtml(html)).toBe('bug/proj-42_fix-login')
   })
 
-  function stubWindow(url: string, bodyHtml: string) {
-    vi.stubGlobal('window', {
-      location: { href: url },
-      document: {
-        documentElement: {
-          outerHTML: `<html><body>${bodyHtml}</body></html>`,
-        },
-      },
-    })
-  }
+  it('throws when required elements are missing', () => {
+    expect(() => buildBranchNameFromHtml('<html><body></body></html>')).toThrow()
+  })
+})
 
-  it('returns a branch name when the domain matches', async () => {
-    stubWindow(
-      'https://jira.example.com/browse/PROJ-42',
-      `<span id="type-val">Bug</span>
-       <a id="key-val">PROJ-42</a>
-       <h1 id="summary-val">Fix Login</h1>`,
-    )
-    const result = await main('jira.example.com')
-    expect(result).toBe('bug/proj-42_fix-login')
+describe('isJiraDomain', () => {
+  it('returns true when URL contains the domain', () => {
+    expect(isJiraDomain('https://jira.example.com/browse/PROJ-1', 'jira.example.com')).toBe(true)
   })
 
-  it('returns error message when domain does not match', async () => {
-    stubWindow('https://other-site.com/page', '')
-    const result = await main('jira.example.com')
-    expect(result).toBe('Could not generate branch name')
+  it('returns false when URL does not contain the domain', () => {
+    expect(isJiraDomain('https://other-site.com/page', 'jira.example.com')).toBe(false)
   })
 
-  it('returns error message when domain is empty', async () => {
-    stubWindow('https://any-site.com/page', '')
-    const result = await main('')
-    expect(result).toBe('Could not generate branch name')
+  it('returns false when domain is empty', () => {
+    expect(isJiraDomain('https://any-site.com/page', '')).toBe(false)
   })
 })

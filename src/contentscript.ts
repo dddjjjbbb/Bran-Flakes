@@ -1,20 +1,17 @@
-import { loadDomain } from './config'
-import { Parser } from './parser'
+import { parse } from 'node-html-parser'
 import { Ticket } from './ticket'
 
 export { TICKET_TYPE_ABBREVIATIONS, Ticket } from './ticket'
-export { Parser } from './parser'
 
-export async function main(domainName: string) {
-  if (domainName && window.location.href.includes(domainName)) {
-    const parser = new Parser(window)
-    const html = parser.parseHtml()
-    const ticket = new Ticket(html)
-    return ticket.buildBranchName()
-  }
-  return 'Could not generate branch name'
+export function buildBranchNameFromHtml(html: string): string {
+  const parsed = parse(html)
+  const ticket = new Ticket(parsed)
+  return ticket.buildBranchName()
 }
 
-if (typeof window !== 'undefined') {
-  loadDomain().then((domain) => main(domain)).then((result) => alert(result))
+export function isJiraDomain(url: string, domain: string): boolean {
+  if (!domain) {
+    return false
+  }
+  return url.includes(domain)
 }
