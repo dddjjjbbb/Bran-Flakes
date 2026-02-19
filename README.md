@@ -65,4 +65,4 @@ Special characters (parentheses, colons, brackets, and other git-invalid charact
 
 ## Licence
 
-GPLv3
+[GPLv3](LICENSE)
