@@ -1,4 +1,4 @@
-export const DEFAULT_DOMAIN = 'jira.sharethemeal.org'
+export const DEFAULT_DOMAIN = ''
 const STORAGE_KEY = 'jiraDomain'
 
 export function loadDomain(): Promise<string> {

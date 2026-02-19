@@ -6,7 +6,7 @@ export { TICKET_TYPE_ABBREVIATIONS, Ticket } from './ticket'
 export { Parser } from './parser'
 
 export async function main(domainName: string) {
-  if (window.location.href.includes(domainName)) {
+  if (domainName && window.location.href.includes(domainName)) {
     const parser = new Parser(window)
     const html = parser.parseHtml()
     const ticket = new Ticket(html)
