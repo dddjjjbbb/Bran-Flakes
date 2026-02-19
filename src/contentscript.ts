@@ -17,13 +17,13 @@ export class Parser {
   }
 }
 
-export enum TicketType {
-  Tech = 'Tech Ticket' as any,
-  Bug = 'Bug' as any,
-  Task = 'Task' as any,
-  Epic = 'Epic' as any,
-  Feature = 'Feature Story' as any,
-  Release = 'Release Ticket' as any,
+export const TICKET_TYPE_ABBREVIATIONS: Record<string, string> = {
+  'Tech Ticket': 'Tech',
+  'Bug': 'Bug',
+  'Task': 'Task',
+  'Epic': 'Epic',
+  'Feature Story': 'Feature',
+  'Release Ticket': 'Release',
 }
 
 // tslint:disable-next-line:max-classes-per-file
@@ -48,13 +48,8 @@ export class Ticket {
 
   public async _getabbreviated_ticket_name(
     ticketType: string,
-  ): Promise<string | undefined> {
-    const enumKey = TicketType[ticketType]
-
-    if (enumKey !== 'undefined') {
-      return enumKey
-    }
-    return ticketType
+  ): Promise<string> {
+    return TICKET_TYPE_ABBREVIATIONS[ticketType] || ticketType
   }
 
   public async _getTicketType(): Promise<string | undefined> {
